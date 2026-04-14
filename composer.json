@@ -1,0 +1,28 @@
+{
+    "name": "virtualsms/sdk",
+    "description": "PHP SDK for VirtualSMS — SMS verification with real physical SIM cards. WhatsApp, Telegram, Google and 700+ services.",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://virtualsms.io",
+    "keywords": ["sms", "verification", "virtual-number", "whatsapp", "telegram", "otp", "sim-card", "sms-activate"],
+    "authors": [
+        {
+            "name": "VirtualSMS",
+            "email": "dev@virtualsms.io",
+            "homepage": "https://virtualsms.io"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "VirtualSMS\\": "src/"
+        }
+    },
+    "support": {
+        "docs": "https://virtualsms.io/api",
+        "issues": "https://github.com/virtualsms-io/php-sdk/issues",
+        "source": "https://github.com/virtualsms-io/php-sdk"
+    }
+}
