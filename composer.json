@@ -22,7 +22,7 @@
     },
     "support": {
         "docs": "https://virtualsms.io/api",
-        "issues": "https://github.com/virtualsms-io/php-sdk/issues",
-        "source": "https://github.com/virtualsms-io/php-sdk"
+        "issues": "https://github.com/virtualsms-io/virtualsms-php-sdk/issues",
+        "source": "https://github.com/virtualsms-io/virtualsms-php-sdk"
     }
 }
