@@ -92,6 +92,11 @@ Full [migration guide](https://virtualsms.io/daisysms-alternative).
 - [VirtualSMS on mcp.so](https://mcp.so/servers/mcp-server-virtualsms-io)
 - [virtualsms-mcp on npm](https://www.npmjs.com/package/virtualsms-mcp)
 
+## Development
+
+Run `sh scripts/check-positioning.sh` before committing copy changes. It fails on
+stale service or country counts and other banned positioning wording.
+
 ## License
 
 MIT
