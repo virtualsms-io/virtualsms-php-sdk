@@ -4,7 +4,7 @@ VirtualSMS is an account verification platform that combines real carrier mobile
 
 Built for developers and AI agents: REST API, hosted MCP server, SDKs.
 
-This is the **PHP client for SMS verification** — real carrier numbers, not VoIP. Near-100% delivery on WhatsApp, Telegram, and other platforms that block virtual numbers. Prices are public and live stock is visible before checkout, so what you see is what you pay.
+This is the **PHP client for SMS verification**: real carrier numbers, not VoIP, so codes land on WhatsApp, Telegram, and other platforms that block virtual numbers. 95%+ delivery on real carrier SIMs. Prices are public and live stock is visible before checkout, so what you see is what you pay.
 
 ## Installation
 
@@ -47,22 +47,22 @@ $client->done($activation->activationId);
 | Facebook | `fb` |
 | Discord | `ds` |
 
-700+ services supported. Full list at [virtualsms.io/services](https://virtualsms.io/services).
+2500+ services supported. Full list at [virtualsms.io/services](https://virtualsms.io/services).
 
 ## What this SDK does
 
 This package wraps the SMS **verification** endpoints only: request a number, poll for the code, mark it done or cancel it. It does not talk to proxies, number rentals, or the cloud browser.
 
-- `getBalance()` — Account balance in USD
-- `getNumber($service, $country)` — Get a phone number
-- `getStatus($activationId)` — Check SMS status
-- `waitForCode($activationId)` — Auto-poll until code arrives
-- `done($activationId)` — Mark complete
-- `cancel($activationId)` — Cancel and refund
+- `getBalance()`: Account balance in USD
+- `getNumber($service, $country)`: Get a phone number
+- `getStatus($activationId)`: Check SMS status
+- `waitForCode($activationId)`: Auto-poll until code arrives
+- `done($activationId)`: Mark complete
+- `cancel($activationId)`: Cancel and refund
 
-**Need proxies, number rentals, or the cloud browser?** Those are part of the wider VirtualSMS platform but aren't exposed by this SDK yet (roadmap — coming soon). Use them today via:
-- The [REST API](https://virtualsms.io/docs) — full platform access: numbers, proxies, cloud browser
-- The [hosted MCP server](https://virtualsms.io/mcp) — lets AI agents drive the full platform (numbers, proxies, cloud browser) directly
+**Need proxies, number rentals, or the cloud browser?** Those are part of the wider VirtualSMS platform but aren't exposed by this SDK yet (roadmap, coming soon). Use them today via:
+- The [REST API](https://virtualsms.io/docs): full platform access, including numbers, proxies and cloud browser
+- The [hosted MCP server](https://virtualsms.io/mcp): lets AI agents drive the full platform (numbers, proxies, cloud browser) directly
 
 ## Migrating from DaisySMS?
 
