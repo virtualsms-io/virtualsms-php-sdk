@@ -1,8 +1,10 @@
 # VirtualSMS PHP SDK
 
-PHP client for [VirtualSMS](https://virtualsms.io) — SMS verification using real physical SIM cards.
+VirtualSMS is an account verification platform that combines real carrier mobile numbers, matching-country proxies and a private cloud browser into one connected workflow.
 
-Unlike VoIP-based services, VirtualSMS uses real SIM cards in hardware modems connected to European and US cellular networks. Near-100% delivery rates on WhatsApp, Telegram, and platforms that block virtual numbers.
+Built for developers and AI agents: REST API, hosted MCP server, SDKs.
+
+This is the **PHP client for SMS verification** — real carrier numbers, not VoIP. Near-100% delivery on WhatsApp, Telegram, and other platforms that block virtual numbers. Prices are public and live stock is visible before checkout, so what you see is what you pay.
 
 ## Installation
 
@@ -47,7 +49,9 @@ $client->done($activation->activationId);
 
 700+ services supported. Full list at [virtualsms.io/services](https://virtualsms.io/services).
 
-## API Methods
+## What this SDK does
+
+This package wraps the SMS **verification** endpoints only: request a number, poll for the code, mark it done or cancel it. It does not talk to proxies, number rentals, or the cloud browser.
 
 - `getBalance()` — Account balance in USD
 - `getNumber($service, $country)` — Get a phone number
@@ -55,6 +59,10 @@ $client->done($activation->activationId);
 - `waitForCode($activationId)` — Auto-poll until code arrives
 - `done($activationId)` — Mark complete
 - `cancel($activationId)` — Cancel and refund
+
+**Need proxies, number rentals, or the cloud browser?** Those are part of the wider VirtualSMS platform but aren't exposed by this SDK yet (roadmap — coming soon). Use them today via:
+- The [REST API](https://virtualsms.io/docs) — full platform access: numbers, proxies, cloud browser
+- The [hosted MCP server](https://virtualsms.io/mcp) — lets AI agents drive the full platform (numbers, proxies, cloud browser) directly
 
 ## Migrating from DaisySMS?
 
@@ -67,12 +75,22 @@ Full [migration guide](https://virtualsms.io/daisysms-alternative).
 
 ## Links
 
-- **Website:** [virtualsms.io](https://virtualsms.io)
-- **API Docs:** [virtualsms.io/api](https://virtualsms.io/api)
+- **Homepage:** [virtualsms.io](https://virtualsms.io)
+- **Docs:** [virtualsms.io/docs](https://virtualsms.io/docs)
+- **MCP server:** [virtualsms.io/mcp](https://virtualsms.io/mcp)
 - **Pricing:** [virtualsms.io/pricing](https://virtualsms.io/pricing)
+- **REST API:** [virtualsms.io/api/v1](https://virtualsms.io/api/v1)
 - **Python SDK:** [pypi.org/project/virtualsms](https://pypi.org/project/virtualsms/)
 - **Node.js SDK:** [npmjs.com/package/virtualsms-sdk](https://www.npmjs.com/package/virtualsms-sdk)
 - **GitHub:** [github.com/virtualsms-io](https://github.com/virtualsms-io)
+
+### Ecosystem
+
+- Official MCP registry: `io.github.virtualsms-io/sms`
+- [VirtualSMS on Glama](https://glama.ai/mcp/servers)
+- [VirtualSMS on Smithery](https://smithery.ai/servers/virtualsms/virtualsms-mcp)
+- [VirtualSMS on mcp.so](https://mcp.so/servers/mcp-server-virtualsms-io)
+- [virtualsms-mcp on npm](https://www.npmjs.com/package/virtualsms-mcp)
 
 ## License
 

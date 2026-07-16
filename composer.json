@@ -1,6 +1,6 @@
 {
     "name": "virtualsms/sdk",
-    "description": "PHP SDK for VirtualSMS — SMS verification with real physical SIM cards. WhatsApp, Telegram, Google and 700+ services.",
+    "description": "PHP SDK for VirtualSMS SMS verification — real carrier numbers, not VoIP. WhatsApp, Telegram, Google and 700+ services.",
     "type": "library",
     "license": "MIT",
     "homepage": "https://virtualsms.io",
