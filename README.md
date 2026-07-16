@@ -51,7 +51,7 @@ $client->done($activation->activationId);
 
 ## What this SDK does
 
-This package wraps the SMS **verification** endpoints only: request a number, poll for the code, mark it done or cancel it. It does not talk to proxies, number rentals, or the cloud browser.
+This package wraps the SMS **verification** endpoints only: request a number, poll for the code, mark it done or cancel it. It does not talk to proxies or number rentals (both live on the platform). The private cloud browser isn't live anywhere yet, coming soon.
 
 - `getBalance()`: Account balance in USD
 - `getNumber($service, $country)`: Get a phone number
@@ -60,9 +60,9 @@ This package wraps the SMS **verification** endpoints only: request a number, po
 - `done($activationId)`: Mark complete
 - `cancel($activationId)`: Cancel and refund
 
-**Need proxies, number rentals, or the cloud browser?** Those are part of the wider VirtualSMS platform but aren't exposed by this SDK yet (roadmap, coming soon). Use them today via:
-- The [REST API](https://virtualsms.io/docs): full platform access, including numbers, proxies and cloud browser
-- The [hosted MCP server](https://virtualsms.io/mcp): lets AI agents drive the full platform (numbers, proxies, cloud browser) directly
+**Need proxies or number rentals?** Both are live on the wider VirtualSMS platform but aren't exposed by this SDK yet (roadmap, coming soon to this SDK). Use them today via:
+- The [REST API](https://virtualsms.io/docs): full live platform access, numbers, proxies, rentals. The private cloud browser is planned and not yet available on any surface.
+- The [hosted MCP server](https://virtualsms.io/mcp): lets AI agents drive numbers, proxies, and rentals directly today; cloud browser tools are coming soon
 
 ## Migrating from DaisySMS?
 
