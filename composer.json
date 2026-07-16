@@ -1,6 +1,6 @@
 {
     "name": "virtualsms/sdk",
-    "description": "VirtualSMS is an account verification platform that combines real carrier mobile numbers, matching-country proxies and a private cloud browser into one connected workflow. This package is the PHP SDK for SMS verification: real carrier numbers, not VoIP, across WhatsApp, Telegram, Google and 2500+ services in 145+ countries.",
+    "description": "VirtualSMS is an account verification platform that combines real carrier mobile numbers, matching-country proxies and a private cloud browser into one connected workflow. This package is the PHP SDK for SMS verification: real physical SIM cards, not VoIP, across WhatsApp, Telegram, Google and 2500+ services in 145+ countries.",
     "type": "library",
     "license": "MIT",
     "homepage": "https://virtualsms.io",

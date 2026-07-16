@@ -3,7 +3,7 @@
 namespace VirtualSMS;
 
 /**
- * VirtualSMS PHP SDK — SMS verification with real carrier SIMs.
+ * VirtualSMS PHP SDK: SMS verification with real physical SIM cards, not VoIP.
  *
  * @see https://virtualsms.io
  * @see https://virtualsms.io/api

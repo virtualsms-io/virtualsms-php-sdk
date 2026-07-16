@@ -4,7 +4,7 @@ VirtualSMS is an account verification platform that combines real carrier mobile
 
 Built for developers and AI agents: REST API, hosted MCP server, SDKs.
 
-This is the **PHP client for SMS verification**: real carrier numbers, not VoIP, so codes land on WhatsApp, Telegram, and other platforms that block virtual numbers. 95%+ delivery on real carrier SIMs. Prices are public and live stock is visible before checkout, so what you see is what you pay.
+This is the **PHP client for SMS verification**: real physical SIM cards, not VoIP, so codes land on WhatsApp, Telegram, and other platforms that block virtual numbers. 95%+ delivery on real carrier SIMs. Prices are public and live stock is visible before checkout, so what you see is what you pay.
 
 ## Installation
 
