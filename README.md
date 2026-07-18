@@ -21,10 +21,12 @@ Requires PHP 7.4+ with the `curl` and `json` extensions (bundled by default in a
 
 ## Quick Start
 
+<!-- TODO: re-point to /dashboard once the frontend migration ships -->
+
 ```php
 use VirtualSMS\VirtualSMS;
 
-// 1. Get your API key at https://virtualsms.io/dashboard (Settings -> API Keys)
+// 1. Get your API key at https://virtualsms.io (Settings -> API Keys)
 $client = new VirtualSMS('vsms_your_api_key');
 
 // 2. Buy a number for WhatsApp verification
