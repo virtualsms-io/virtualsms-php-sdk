@@ -5,6 +5,7 @@ namespace VirtualSMS\Concerns;
 use VirtualSMS\Exceptions\ApiException;
 use VirtualSMS\Exceptions\BadApiKeyException;
 use VirtualSMS\Exceptions\InsufficientBalanceException;
+use VirtualSMS\Exceptions\NoNumbersException;
 use VirtualSMS\Exceptions\NotFoundException;
 use VirtualSMS\Exceptions\RateLimitedException;
 use VirtualSMS\Exceptions\ServerErrorException;
@@ -137,6 +138,10 @@ trait MakesHttpRequests
             throw new RateLimitedException('Rate limit exceeded. Please slow down requests.');
         }
         if ($status >= 500) {
+            $lowerMessage = strtolower($message);
+            if (strpos($lowerMessage, 'out of stock') !== false || strpos($lowerMessage, 'no numbers') !== false) {
+                throw new NoNumbersException("No numbers currently available: {$message}", !$isMutating);
+            }
             if ($isMutating) {
                 throw new ServerErrorException(
                     "VirtualSMS had a server error ({$status}) on a request that may have made a purchase or changed " .
