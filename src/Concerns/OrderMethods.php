@@ -13,10 +13,10 @@ use VirtualSMS\Exceptions\VirtualSMSException;
  */
 trait OrderMethods
 {
-    /** List all SMS-verification services (Telegram, WhatsApp, etc.). Public, no auth. */
+    /** List all SMS-verification services (Telegram, WhatsApp, etc.). Requires an API key. */
     public function list_services(): array
     {
-        $res = $this->request('GET', '/api/v1/customer/services', [], null, false);
+        $res = $this->request('GET', '/api/v1/customer/services', [], null, true);
         $raw = $res['services'] ?? $res;
         $out = [];
         foreach ((array) $raw as $s) {
@@ -29,10 +29,10 @@ trait OrderMethods
         return $out;
     }
 
-    /** List all available countries. Public, no auth. */
+    /** List all available countries. Requires an API key. */
     public function list_countries(): array
     {
-        $res = $this->request('GET', '/api/v1/customer/countries', [], null, false);
+        $res = $this->request('GET', '/api/v1/customer/countries', [], null, true);
         $raw = $res['countries'] ?? $res;
         $out = [];
         foreach ((array) $raw as $c) {

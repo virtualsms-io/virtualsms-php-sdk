@@ -45,7 +45,7 @@ final class SmokeTest extends TestCase
     public function testGetPriceReturnsShapedResult(): void
     {
         $client = $this->client();
-        $price = $client->get_price('tg', 'US');
+        $price = $client->get_price('wa', 'GB');
         self::assertArrayHasKey('price_usd', $price);
         self::assertArrayHasKey('currency', $price);
         self::assertArrayHasKey('available', $price);
