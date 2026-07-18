@@ -52,10 +52,14 @@ final class SmokeTest extends TestCase
         self::assertIsBool($price['available']);
     }
 
-    /** Public endpoints must work with no API key at all. */
+    /**
+     * list_countries requires a valid key against the live API (it is not
+     * an anonymous/public endpoint despite the name), so this reuses the
+     * same skip-when-unset guard as the rest of this suite.
+     */
     public function testPublicEndpointsWorkWithoutApiKey(): void
     {
-        $client = new VirtualSMS();
+        $client = $this->client();
         $countries = $client->list_countries();
         self::assertIsArray($countries);
     }
