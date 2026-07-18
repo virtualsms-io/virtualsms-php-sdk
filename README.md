@@ -1,10 +1,10 @@
 # VirtualSMS PHP SDK
 
-VirtualSMS is an account verification platform that combines real carrier mobile numbers, matching-country proxies and a private cloud browser into one connected workflow.
+Native PHP client for the **VirtualSMS REST API v1**: real carrier mobile numbers (not VoIP), number rentals, and matching-country proxies, all in one typed client.
 
 Built for developers and AI agents: REST API, hosted MCP server, SDKs.
 
-This is the **PHP client for SMS verification**: real physical SIM cards, not VoIP, so codes land on WhatsApp, Telegram, and other platforms that block virtual numbers. 95%+ delivery on real carrier SIMs. Prices are public and live stock is visible before checkout, so what you see is what you pay.
+Real physical SIM cards, not VoIP, so codes land on WhatsApp, Telegram, and other platforms that block virtual numbers. 95%+ delivery on real carrier SIMs. Prices are public and live stock is visible before checkout, so what you see is what you pay.
 
 ## Installation
 
@@ -12,66 +12,89 @@ This is the **PHP client for SMS verification**: real physical SIM cards, not Vo
 composer require virtualsms/sdk
 ```
 
+Requires PHP 7.4+ with the `curl` and `json` extensions (bundled by default in almost every PHP install).
+
 ## Quick Start
 
 ```php
 use VirtualSMS\VirtualSMS;
 
-// Get your API key at https://virtualsms.io (Settings → API Keys)
+// 1. Get your API key at https://virtualsms.io/dashboard (Settings -> API Keys)
 $client = new VirtualSMS('vsms_your_api_key');
 
-// Check balance
-$balance = $client->getBalance();
-echo "Balance: \${$balance}\n";
+// 2. Buy a number for WhatsApp verification
+$order = $client->create_order('wa', 'GB'); // service code, ISO country
+echo "Use this number: {$order['phone_number']}\n";
 
-// Get a number for WhatsApp verification
-$activation = $client->getNumber('wa', 22); // 22 = UK
-echo "Use this number: {$activation->phone}\n";
-
-// Wait for the verification code
-$code = $client->waitForCode($activation->activationId);
-echo "Verification code: {$code}\n";
-
-// Mark as done
-$client->done($activation->activationId);
+// 3. Wait for the verification code
+$result = $client->wait_for_sms($order['order_id']);
+if ($result['success']) {
+    echo "Code: {$result['code']}\n";
+}
 ```
 
-## Service Codes
+Full docs: [virtualsms.io/docs](https://virtualsms.io/docs).
 
-| Service | Code |
-|---------|------|
-| WhatsApp | `wa` |
-| Telegram | `tg` |
-| Google | `go` |
-| Instagram | `ig` |
-| Facebook | `fb` |
-| Discord | `ds` |
+## What this SDK covers
 
-2500+ services supported. Full list at [virtualsms.io/services](https://virtualsms.io/services).
+A native client for the whole VirtualSMS REST v1 surface, 47 methods across seven groups:
 
-## What this SDK does
+| Group | Examples |
+|---|---|
+| Activations / Orders | `create_order`, `get_order`, `wait_for_sms`, `cancel_order`, `swap_number`, `search_services`, `find_cheapest` |
+| Rentals | `create_rental` (Full Access + Platform tiers), `list_rentals`, `extend_rental`, `cancel_rental` |
+| Proxies | `list_proxy_catalog`, `buy_proxy`, `rotate_proxy`, `generate_proxy_endpoint` |
+| Account | `get_balance`, `get_profile`, `get_transactions`, `get_stats` |
+| Session | `start_manual_registration_session` (invite-only beta) |
+| Tools | `check_number` |
+| Webhooks | `create_webhook`, `list_webhooks`, `update_webhook`, `list_webhook_deliveries` |
 
-This package wraps the SMS **verification** endpoints only: request a number, poll for the code, mark it done or cancel it. It does not talk to proxies or number rentals (both live on the platform). The private cloud browser isn't live anywhere yet, coming soon.
+See [`examples/`](examples/) for full activation, rental, and proxy flows.
 
-- `getBalance()`: Account balance in USD
-- `getNumber($service, $country)`: Get a phone number
-- `getStatus($activationId)`: Check SMS status
-- `waitForCode($activationId)`: Auto-poll until code arrives
-- `done($activationId)`: Mark complete
-- `cancel($activationId)`: Cancel and refund
+## Error handling
 
-**Need proxies or number rentals?** Both are live on the wider VirtualSMS platform but aren't exposed by this SDK yet (roadmap, coming soon to this SDK). Use them today via:
-- The [REST API](https://virtualsms.io/docs): full live platform access, numbers, proxies, rentals. The private cloud browser is planned and not yet available on any surface.
-- The [hosted MCP server](https://virtualsms.io/mcp): lets AI agents drive numbers, proxies, and rentals directly today; cloud browser tools are coming soon
+Every failure throws a typed exception under `VirtualSMS\Exceptions`, all extending `VirtualSMSException`:
 
-## Migrating from DaisySMS?
+| Exception | Cause |
+|---|---|
+| `BadApiKeyException` | Invalid or missing API key (HTTP 401) |
+| `InsufficientBalanceException` | Balance too low for the purchase (HTTP 402) |
+| `NotFoundException` | Order/rental/proxy/webhook id doesn't exist (HTTP 404) |
+| `RateLimitedException` | Too many requests (HTTP 429), never auto-retried |
+| `ServerErrorException` | 5xx. `isRetryable()` is `true` only for GET/HEAD calls: a 5xx on a purchase/cancel/rotate call may have completed server-side, so verify with a `list_*`/`get_*` call before retrying |
+| `ApiException` | Any other 4xx |
 
 ```php
-// Change one line:
-$client = new VirtualSMS('your_key'); // defaults to virtualsms.io
+use VirtualSMS\Exceptions\InsufficientBalanceException;
+
+try {
+    $client->create_order('wa', 'GB');
+} catch (InsufficientBalanceException $e) {
+    echo "Top up your balance: {$e->getMessage()}\n";
+}
 ```
 
-Full [migration guide](https://virtualsms.io/daisysms-alternative).
+GET/HEAD requests are retried automatically (up to 3 total attempts, exponential backoff) on network errors or 5xx. Mutating calls (POST/PUT/PATCH/DELETE) are never auto-retried by this SDK.
+
+## Two rental tiers
+
+Both refund-identical: full refund within 20 minutes of purchase, before the first SMS.
+
+- **Full Access** (`tier: 'full_access'`): local SIM inventory, usable for any service, longer durations.
+- **Platform** (`tier: 'platform'`): sourced via our global supplier network, locked to one chosen service per number, 24/72/168h durations only.
+
+```php
+$client->create_rental([
+    'tier' => 'full_access',
+    'country' => 'DE',
+    'rental_type' => 'full',
+    'duration_hours' => 24,
+]);
+```
+
+## Publishing
+
+This package is versioned via git tags: pushing a `vX.Y.Z` tag to this repo triggers Packagist's update webhook automatically (no separate publish workflow/token needed on this repo). Packagist always reflects the latest tag.
 
 ## Links
 
@@ -94,8 +117,19 @@ Full [migration guide](https://virtualsms.io/daisysms-alternative).
 
 ## Development
 
-Run `sh scripts/check-positioning.sh` before committing copy changes. It fails on
-stale service or country counts and other banned positioning wording.
+```bash
+composer install
+composer test          # PHPUnit smoke tests (get_balance, list_services, get_price)
+sh scripts/check-positioning.sh   # run before committing copy changes
+```
+
+Live smoke tests require a real key: `VIRTUALSMS_TEST_API_KEY=vsms_xxx composer test`. Without it, the smoke tests skip cleanly (a first checkout with no credentials still passes CI's structural checks).
+
+## Changelog
+
+### 2.0.0: Breaking change
+
+First REST v1-native major release. Talks to `https://virtualsms.io/api/v1/*` directly. The previous 1.x line wrapped the legacy `/stubs/handler_api.php` sms-activate-compatible dispatcher (`getBalance`/`getNumber`/`getStatus`/`waitForCode`/`done`/`cancel`); that dispatcher is **not used at all** by 2.x. If you're upgrading from 1.x, method names and the constructor's return shapes have changed, see Quick Start above.
 
 ## License
 

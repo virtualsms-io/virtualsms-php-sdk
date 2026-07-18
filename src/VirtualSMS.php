@@ -2,176 +2,73 @@
 
 namespace VirtualSMS;
 
+use VirtualSMS\Concerns\AccountMethods;
+use VirtualSMS\Concerns\MakesHttpRequests;
+use VirtualSMS\Concerns\OrderMethods;
+use VirtualSMS\Concerns\ProxyMethods;
+use VirtualSMS\Concerns\RentalMethods;
+use VirtualSMS\Concerns\SessionMethods;
+use VirtualSMS\Concerns\ToolMethods;
+use VirtualSMS\Concerns\WebhookMethods;
+use VirtualSMS\Exceptions\BadApiKeyException;
+
 /**
- * VirtualSMS PHP SDK: SMS verification with real physical SIM cards, not VoIP.
+ * VirtualSMS PHP SDK v2.0.0 — a native client for the VirtualSMS REST API v1.
+ *
+ * Real carrier mobile numbers (not VoIP), matching-country proxies, and
+ * short-term number rentals, all reachable through one typed client.
  *
  * @see https://virtualsms.io
- * @see https://virtualsms.io/api
+ * @see https://virtualsms.io/docs
  */
 class VirtualSMS
 {
-    private string $apiKey;
+    use MakesHttpRequests;
+    use OrderMethods;
+    use RentalMethods;
+    use ProxyMethods;
+    use AccountMethods;
+    use SessionMethods;
+    use ToolMethods;
+    use WebhookMethods;
+
+    private ?string $apiKey;
     private string $baseUrl;
+    private int $timeout;
 
     /**
-     * Create a VirtualSMS client.
-     *
-     * @param string $apiKey Your API key from https://virtualsms.io (Settings → API Keys)
-     * @param string $baseUrl API base URL (default: production)
+     * @param string|null $apiKey Your API key from https://virtualsms.io (Settings -> API Keys).
+     *                            Required for authenticated calls; public endpoints (list_services,
+     *                            list_countries, get_price, check_number, ...) work without one.
+     * @param array{baseUrl?: string, timeout?: int} $options
+     *                            baseUrl defaults to https://virtualsms.io (or $VIRTUALSMS_BASE_URL
+     *                            if set). timeout is in seconds, default 30.
      */
-    public function __construct(string $apiKey, string $baseUrl = 'https://virtualsms.io/stubs/handler_api.php')
+    public function __construct(?string $apiKey = null, array $options = [])
     {
         $this->apiKey = $apiKey;
-        $this->baseUrl = $baseUrl;
+        $envBaseUrl = getenv('VIRTUALSMS_BASE_URL');
+        $this->baseUrl = rtrim($options['baseUrl'] ?? ($envBaseUrl !== false ? $envBaseUrl : 'https://virtualsms.io'), '/');
+        $this->timeout = $options['timeout'] ?? 30;
     }
 
-    /**
-     * Get current account balance in USD.
-     *
-     * @return float Account balance
-     * @throws VirtualSMSException If API key is invalid
-     *
-     * @example
-     * $client = new VirtualSMS('vsms_your_key');
-     * echo "Balance: $" . $client->getBalance();
-     */
-    public function getBalance(): float
+    /** @throws BadApiKeyException if no API key was supplied to the constructor. */
+    public function requireApiKey(): void
     {
-        $result = $this->request('getBalance');
-        if (str_starts_with($result, 'ACCESS_BALANCE:')) {
-            return (float) explode(':', $result)[1];
-        }
-        throw new VirtualSMSException($result);
-    }
-
-    /**
-     * Request a phone number for SMS verification.
-     *
-     * @param string $service Service code ('wa' for WhatsApp, 'tg' for Telegram)
-     * @param int $country Country ID (187=US, 22=UK, 12=Germany)
-     * @return Activation Phone number and activation details
-     *
-     * @example
-     * $activation = $client->getNumber('wa', 22); // WhatsApp, UK
-     * echo "Use number: " . $activation->phone;
-     */
-    public function getNumber(string $service, int $country = 187): Activation
-    {
-        $result = $this->request('getNumber', [
-            'service' => $service,
-            'country' => $country,
-        ]);
-
-        if (str_starts_with($result, 'ACCESS_NUMBER:')) {
-            $parts = explode(':', $result);
-            return new Activation(
-                activationId: (int) $parts[1],
-                phone: $parts[2],
-                service: $service,
-                country: $country
+        if ($this->apiKey === null || $this->apiKey === '') {
+            throw new BadApiKeyException(
+                'An API key is required for this operation. Get your API key at https://virtualsms.io'
             );
         }
-
-        if ($result === 'NO_NUMBERS') {
-            throw new NoNumbersException("No numbers available for {$service} in country {$country}");
-        }
-
-        throw new VirtualSMSException($result);
     }
 
-    /**
-     * Check the status of an activation.
-     *
-     * @param int $activationId The activation ID from getNumber()
-     * @return array{status: string, code: ?string}
-     */
-    public function getStatus(int $activationId): array
+    public function getApiKey(): ?string
     {
-        $result = $this->request('getStatus', ['id' => $activationId]);
-
-        if ($result === 'STATUS_WAIT_CODE') {
-            return ['status' => 'waiting', 'code' => null];
-        }
-        if (str_starts_with($result, 'STATUS_OK:')) {
-            return ['status' => 'received', 'code' => explode(':', $result)[1]];
-        }
-        if ($result === 'STATUS_CANCEL') {
-            return ['status' => 'cancelled', 'code' => null];
-        }
-
-        return ['status' => $result, 'code' => null];
+        return $this->apiKey;
     }
 
-    /**
-     * Mark activation as done (code used successfully).
-     */
-    public function done(int $activationId): string
+    public function getBaseUrl(): string
     {
-        return $this->request('setStatus', ['id' => $activationId, 'status' => 6]);
-    }
-
-    /**
-     * Cancel activation and get automatic refund.
-     */
-    public function cancel(int $activationId): string
-    {
-        return $this->request('setStatus', ['id' => $activationId, 'status' => 8]);
-    }
-
-    /**
-     * Wait for an SMS code to arrive.
-     *
-     * @param int $activationId The activation ID
-     * @param int $timeout Max wait in seconds (default: 300)
-     * @param int $pollInterval Seconds between checks (default: 5)
-     * @return string|null The verification code, or null on timeout
-     *
-     * @example
-     * $activation = $client->getNumber('wa');
-     * $code = $client->waitForCode($activation->activationId);
-     * if ($code) echo "WhatsApp code: $code";
-     */
-    public function waitForCode(int $activationId, int $timeout = 300, int $pollInterval = 5): ?string
-    {
-        $start = time();
-        while (time() - $start < $timeout) {
-            $result = $this->getStatus($activationId);
-            if ($result['code'] !== null) {
-                return $result['code'];
-            }
-            if ($result['status'] === 'cancelled') {
-                return null;
-            }
-            sleep($pollInterval);
-        }
-        return null;
-    }
-
-    private function request(string $action, array $params = []): string
-    {
-        $params['action'] = $action;
-        $params['api_key'] = $this->apiKey;
-
-        $url = $this->baseUrl . '?' . http_build_query($params);
-        $response = file_get_contents($url);
-
-        if ($response === false) {
-            throw new VirtualSMSException("HTTP request failed for action: {$action}");
-        }
-
-        return trim($response);
+        return $this->baseUrl;
     }
 }
-
-class Activation
-{
-    public function __construct(
-        public readonly int $activationId,
-        public readonly string $phone,
-        public readonly string $service,
-        public readonly int $country,
-    ) {}
-}
-
-class VirtualSMSException extends \RuntimeException {}
-class NoNumbersException extends VirtualSMSException {}

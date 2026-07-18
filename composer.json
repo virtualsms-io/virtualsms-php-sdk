@@ -1,10 +1,11 @@
 {
     "name": "virtualsms/sdk",
-    "description": "VirtualSMS is an account verification platform that combines real carrier mobile numbers, matching-country proxies and a private cloud browser into one connected workflow. This package is the PHP SDK for SMS verification: real physical SIM cards, not VoIP, across WhatsApp, Telegram, Google and 2500+ services in 145+ countries.",
+    "description": "Native PHP client for the VirtualSMS REST API v1: SMS verification with real carrier mobile numbers (not VoIP), number rentals, and matching-country proxies across 2500+ services in 145+ countries.",
     "type": "library",
     "license": "MIT",
+    "version": "2.0.0",
     "homepage": "https://virtualsms.io",
-    "keywords": ["sms", "verification", "virtual-number", "whatsapp", "telegram", "otp", "sim-card", "sms-activate"],
+    "keywords": ["sms", "verification", "virtual-number", "whatsapp", "telegram", "otp", "sim-card", "proxy", "rentals"],
     "authors": [
         {
             "name": "VirtualSMS",
@@ -13,15 +14,28 @@
         }
     ],
     "require": {
-        "php": ">=7.4"
+        "php": ">=7.4",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6 || ^10.0"
     },
     "autoload": {
         "psr-4": {
             "VirtualSMS\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "VirtualSMS\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
     "support": {
-        "docs": "https://virtualsms.io/api",
+        "docs": "https://virtualsms.io/docs",
         "issues": "https://github.com/virtualsms-io/virtualsms-php-sdk/issues",
         "source": "https://github.com/virtualsms-io/virtualsms-php-sdk"
     }
