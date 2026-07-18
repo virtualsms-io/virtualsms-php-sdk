@@ -1,11 +1,11 @@
 {
     "name": "virtualsms/sdk",
-    "description": "Native PHP client for the VirtualSMS REST API v1: SMS verification with real carrier mobile numbers (not VoIP), number rentals, and matching-country proxies across 2500+ services in 145+ countries.",
+    "description": "Official PHP SDK for the VirtualSMS API: SMS verification, number rentals, and matching-country proxies on real carrier-issued mobile numbers (not VoIP), across 2500+ services in 145+ countries.",
     "type": "library",
     "license": "MIT",
     "version": "2.0.0",
     "homepage": "https://virtualsms.io",
-    "keywords": ["sms", "verification", "virtual-number", "whatsapp", "telegram", "otp", "sim-card", "proxy", "rentals"],
+    "keywords": ["sms-verification", "otp", "virtual-number", "phone-verification", "sms-api", "account-verification", "ai-agents", "mcp", "php-sdk", "2fa"],
     "authors": [
         {
             "name": "VirtualSMS",
